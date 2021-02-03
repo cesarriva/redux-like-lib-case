@@ -15,6 +15,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/redux-thunk/2.3.0/redux-thunk.min.js"
     integrity="sha512-RP+ONt3lqUkczc2mR9uytsHFpInjOtbFgL0Xtoe5NWdLT+X/vArGKAPU4QGYCeYZMEuAvsutTA3pNfoeP3vyaQ=="
     crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-redux/7.2.2/react-redux.min.js"
+    integrity="sha512-XTD4hwwD/OaJj0jZP9+rdrrirXfDkFaBoZB16n9hP4wuXifvlI4YNtSucUZ4cF4uX6eH30LPFXTyqAGqyfhI6Q=="
+    crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -24,32 +27,6 @@
     function generateId() {
       return Math.random().toString(36).substring(2) + (new Date()).getTime().toString(36);
     }
-
-    // Redux like library
-    // function createStore(reducer) {
-    //   let state;
-    //   let listeners = [];
-
-    //   const getState = () => state;
-
-    //   const subscribe = (listener) => {
-    //     listeners.push(listener);
-    //     return () => {
-    //       listeners = listeners.filter(l => l !== listener);
-    //     };
-    //   };
-
-    //   const dispatch = (action) => {
-    //     state = reducer(state, action);
-    //     listeners.forEach(listener => listener());
-    //   };
-
-    //   return {
-    //     getState,
-    //     subscribe,
-    //     dispatch
-    //   }
-    // }
 
     //App code
     const ADD_TODO = 'ADD_TODO';
@@ -256,8 +233,8 @@
     //     goals: goalsReducer(state.goals, action)
     //   };
     // }
-
     // const store = createStore(rootReducer);
+
     const store = Redux.createStore(Redux.combineReducers({
       todos: todosReducer,
       goals: goalsReducer,
@@ -301,22 +278,22 @@
     class Todos extends React.Component {
       addItem = (e) => {
         e.preventDefault();
-        this.props.store.dispatch(handleAddTodo(
+        this.props.dispatch(handleAddTodo(
           this.input.value,
           () => this.input.value = ''
         ));
       }
 
       removeItem = (todo) => {
-        this.props.store.dispatch(handleDeleteTodo(todo));
+        this.props.dispatch(handleDeleteTodo(todo));
       };
 
       toggleItem = (id) => {
-        this.props.store.dispatch(handleToggleTodo(id));
+        this.props.dispatch(handleToggleTodo(id));
       };
 
       render() {
-        const { todos } = this.props.store.getState();
+        const { todos } = this.props;
 
         return (
           <div>
@@ -337,21 +314,25 @@
       }
     }
 
+    const ConnectedTodos = ReactRedux.connect((state) => ({
+      todos: state.todos
+    }))(Todos);
+
     class Goals extends React.Component {
       addItem = (e) => {
         e.preventDefault();
-        this.props.store.dispatch(handleAddGoal(
+        this.props.dispatch(handleAddGoal(
           this.input.value,
           () => this.input.value = ''
         ));
       }
 
       removeItem = (goal) => {
-        this.props.store.dispatch(handleDeleteGoal(goal));
+        this.props.dispatch(handleDeleteGoal(goal));
       };
 
       render() {
-        const { goals } = this.props.store.getState();
+        const { goals } = this.props;
 
         return (
           <div>
@@ -371,15 +352,18 @@
       }
     }
 
+    const ConnectedGoals = ReactRedux.connect((state) => ({
+      goals: state.goals
+    }))(Goals);
+
     class App extends React.Component {
       componentDidMount() {
-        const { store } = this.props;
-        store.dispatch(handleInitialFetch());
-        store.subscribe(() => this.forceUpdate());
+        const { dispatch } = this.props;
+        dispatch(handleInitialFetch());
       }
 
       render() {
-        const { loading } = this.props.store.getState();
+        const { loading } = this.props;
 
         if (loading) {
           return <h3>Loading...</h3>;
@@ -387,15 +371,21 @@
 
         return (
           <div>
-            <Todos store={this.props.store} />
-            <Goals store={this.props.store} />
+            <ConnectedTodos />
+            <ConnectedGoals />
           </div>
         );
       }
     }
 
+    const ConnectedApp = ReactRedux.connect((state) => ({
+      loading: state.loading
+    }))(App);
+
     ReactDOM.render(
-      <App store={store} />,
+      <ReactRedux.Provider store={store}>
+        <ConnectedApp />
+      </ReactRedux.Provider>,
       document.getElementById('app')
     );
   </script>

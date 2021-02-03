@@ -1,3 +1,4 @@
+// ************** Redux like library ***********
 /**
  * 1. Manages an internal state
    2. Exposes a way to get the state
@@ -5,30 +6,30 @@
    4. Exposes a way to update the state 
  * @param - Root Reducer (combined reducers) of the application 
  */
-function createStore(reducer) {
-  let state;
-  let listeners = [];
+// function createStore(reducer) {
+//   let state;
+//   let listeners = [];
 
-  const getState = () => state;
+//   const getState = () => state;
 
-  const subscribe = (listener) => {
-    listeners.push(listener);
-    return () => {
-      listeners = listeners.filter(l => l !== listener);
-    };
-  };
+//   const subscribe = (listener) => {
+//     listeners.push(listener);
+//     return () => {
+//       listeners = listeners.filter(l => l !== listener);
+//     };
+//   };
 
-  const dispatch = (action) => {
-    state = reducer(state, action);
-    listeners.forEach(listener => listener());
-  };
+//   const dispatch = (action) => {
+//     state = reducer(state, action);
+//     listeners.forEach(listener => listener());
+//   };
 
-  return {
-    getState,
-    subscribe,
-    dispatch
-  }
-}
+//   return {
+//     getState,
+//     subscribe,
+//     dispatch
+//   }
+// }
 
 const ADD_TODO = 'ADD_TODO';
 const REMOVE_TODO = 'REMOVE_TODO';
@@ -150,3 +151,57 @@ store.dispatch(addGoal({
 }));
 
 store.dispatch(removeGoal(0));
+
+
+//************React-Redux like library */
+// React-Redux like library
+// const Context = React.createContext();
+
+// /**
+//  *  connect: Render any component, passing that component any data it needs from the store
+// */
+// function connect(mapStateToProps) {
+//   return (Component) => {
+
+//     class Receiver extends React.Component {
+//       componentDidMount() {
+//         const { subscribe } = this.props.store;
+//         this.unsubscribe = subscribe(() => this.forceUpdate());
+//       }
+
+//       componentWillUnmount() {
+//         this.unsubscribe();
+//       }
+
+//       render() {
+//         const { dispatch, getState } = this.props.store;
+//         const state = getState();
+//         const stateNeeded = mapStateToProps(state);
+
+//         return <Component {...stateNeeded} dispatch={dispatch} />;
+//       }
+//     }
+
+//     class ConnectedComponent extends React.Component {
+//       render() {
+//         return (
+//           <Context.Consumer>
+//             {(store) => <Receiver store={store} />}
+//           </Context.Consumer>
+//         );
+//       }
+//     }
+
+//     return ConnectedComponent;
+//   };
+// }
+
+// class Provider extends React.Component {
+//   render() {
+//     return (
+//       <Context.Provider value={this.props.store}>
+//         {this.props.children}
+//       </Context.Provider>
+//     );
+//   }
+// }
