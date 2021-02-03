@@ -1,43 +1,41 @@
 import React from 'react';
-import { connect } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux';
 
 import List from './List';
 import { handleAddGoal, handleRemoveGoal } from '../actions/goals';
 
-class Goals extends React.Component {
-  addItem = (e) => {
+const Goals = () => {
+  const goals = useSelector(state => state.goals);
+  const dispatch = useDispatch();
+  const inputRef = React.useRef('');
+
+  const addItem = (e) => {
     e.preventDefault();
-    this.props.dispatch(handleAddGoal(
-      this.input.value,
-      () => this.input.value = ''
+    dispatch(handleAddGoal(
+      inputRef.current.value,
+      () => inputRef.current.value = ''
     ));
   }
 
-  removeItem = (goal) => {
-    this.props.dispatch(handleRemoveGoal(goal));
+  const removeItem = (goal) => {
+    dispatch(handleRemoveGoal(goal));
   };
 
-  render() {
-    const { goals } = this.props;
-
-    return (
-      <div>
-        <h1>Goal List</h1>
-        <input
-          type='text'
-          placeholder='Add Goal'
-          ref={(input) => this.input = input}
-        />
-        <button onClick={this.addItem}>Add Goal</button>
-        <List
-          items={goals}
-          remove={this.removeItem}
-        />
-      </div>
-    );
-  }
+  return (
+    <div>
+      <h1>Goal List</h1>
+      <input
+        type='text'
+        placeholder='Add Goal'
+        ref={inputRef}
+      />
+      <button onClick={addItem}>Add Goal</button>
+      <List
+        items={goals}
+        remove={removeItem}
+      />
+    </div>
+  );
 }
 
-export default connect((state) => ({
-  goals: state.goals
-}))(Goals);
+export default Goals;
